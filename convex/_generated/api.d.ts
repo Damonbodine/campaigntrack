@@ -8,13 +8,35 @@
  * @module
  */
 
+import type * as campaignPhases from "../campaignPhases.js";
+import type * as campaigns from "../campaigns.js";
+import type * as cultivationActivities from "../cultivationActivities.js";
+import type * as dashboard from "../dashboard.js";
+import type * as donors from "../donors.js";
+import type * as gifts from "../gifts.js";
+import type * as milestones from "../milestones.js";
+import type * as pledges from "../pledges.js";
+import type * as seed from "../seed.js";
+import type * as users from "../users.js";
+
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from "convex/server";
 
-declare const fullApi: ApiFromModules<{}>;
+declare const fullApi: ApiFromModules<{
+  campaignPhases: typeof campaignPhases;
+  campaigns: typeof campaigns;
+  cultivationActivities: typeof cultivationActivities;
+  dashboard: typeof dashboard;
+  donors: typeof donors;
+  gifts: typeof gifts;
+  milestones: typeof milestones;
+  pledges: typeof pledges;
+  seed: typeof seed;
+  users: typeof users;
+}>;
 
 /**
  * A utility for referencing Convex functions in your app's public API.
