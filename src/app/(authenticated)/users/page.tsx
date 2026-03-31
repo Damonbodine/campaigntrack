@@ -12,7 +12,7 @@ export default function UsersPage() {
   const users = useQuery(api.users.list);
 
   return (
-    <RoleGuard allowedRoles={["admin"]}>
+    <RoleGuard allowedRoles={["CampaignDirector"]}>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Users</h1>

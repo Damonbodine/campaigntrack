@@ -8,7 +8,7 @@ export const getStats = query({
     if (!identity) return null;
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return null;
     if (currentUser.role === "BoardMember") return null;
@@ -17,15 +17,15 @@ export const getStats = query({
     const allGifts = await ctx.db
       .query("gifts")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
+      .take(100);
     const allPledges = await ctx.db
       .query("pledges")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
+      .take(100);
     const allMilestones = await ctx.db
       .query("milestones")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
+      .take(100);
     const now = Date.now();
     const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
     const oneMonthAgo = now - 30 * 24 * 60 * 60 * 1000;
@@ -78,7 +78,7 @@ export const getBoardView = query({
     if (!identity) return null;
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return null;
     const campaign = await ctx.db.get(args.campaignId);
@@ -86,20 +86,20 @@ export const getBoardView = query({
     const allGifts = await ctx.db
       .query("gifts")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
+      .take(100);
     const allPledges = await ctx.db
       .query("pledges")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
+      .take(100);
     const allMilestones = await ctx.db
       .query("milestones")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
+      .take(100);
     const allPhases = await ctx.db
       .query("campaignPhases")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
-    const allDonors = await ctx.db.query("donors").collect();
+      .take(100);
+    const allDonors = await ctx.db.query("donors").take(100);
     const thermometerAmount = campaign.thermometerAmount ?? 0;
     const progressPercent =
       campaign.goalAmount > 0
@@ -121,12 +121,23 @@ export const getBoardView = query({
     );
     const phaseBreakdown = allPhases
       .sort((a, b) => a.sequence - b.sequence)
-      .map((phase) => ({
-        name: phase.name,
-        goalAmount: phase.goalAmount,
-        status: phase.status,
-        sequence: phase.sequence,
-      }));
+      .map((phase) => {
+        const phaseStart = new Date(phase.startDate).getTime();
+        const phaseEnd = new Date(phase.endDate).getTime();
+        const raisedAmount = allGifts
+          .filter((g) => {
+            const giftTime = new Date(g.giftDate).getTime();
+            return giftTime >= phaseStart && giftTime <= phaseEnd;
+          })
+          .reduce((sum, g) => sum + g.amount, 0);
+        return {
+          name: phase.name,
+          goalAmount: phase.goalAmount,
+          raisedAmount,
+          status: phase.status,
+          sequence: phase.sequence,
+        };
+      });
     return {
       campaignName: campaign.name,
       goalAmount: campaign.goalAmount,
@@ -161,7 +172,7 @@ export const getRecentGifts = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
     const limit = args.limit ?? 5;
@@ -177,6 +188,7 @@ export const getRecentGifts = query({
       giftType: string;
       donorName: string;
       isAnonymous: boolean;
+      acknowledgmentStatus: string;
     }> = [];
     for (const gift of gifts) {
       let donorName = "Anonymous";
@@ -195,6 +207,7 @@ export const getRecentGifts = query({
         giftType: gift.giftType,
         donorName: gift.isAnonymous ? "Anonymous" : donorName,
         isAnonymous: gift.isAnonymous,
+        acknowledgmentStatus: gift.acknowledgmentStatus,
       });
     }
     return result;

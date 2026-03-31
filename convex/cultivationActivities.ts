@@ -8,7 +8,7 @@ export const listByDonor = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
     if (currentUser.role === "BoardMember") return [];
@@ -19,7 +19,7 @@ export const listByDonor = query({
     return await ctx.db
       .query("cultivationActivities")
       .withIndex("by_donorId", (q) => q.eq("donorId", args.donorId))
-      .collect();
+      .take(100);
   },
 });
 
@@ -30,14 +30,14 @@ export const listByCampaign = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
     if (currentUser.role === "BoardMember") return [];
     const activities = await ctx.db
       .query("cultivationActivities")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
+      .take(100);
     if (currentUser.role === "DevelopmentOfficer") {
       const filtered: typeof activities = [];
       for (const activity of activities) {
@@ -85,7 +85,7 @@ export const create = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role === "BoardMember") throw new Error("Unauthorized");
@@ -146,7 +146,7 @@ export const update = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role === "BoardMember") throw new Error("Unauthorized");

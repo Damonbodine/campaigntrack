@@ -1,0 +1,51 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]
+  - generic [ref=e13]:
+    - generic [ref=e14]:
+      - heading "CampaignTrack" [level=1] [ref=e15]
+      - paragraph [ref=e16]: Capital campaign management for nonprofits
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e21]:
+          - heading "Sign in to My Application" [level=1] [ref=e22]
+          - paragraph [ref=e23]: Welcome back! Please sign in to continue
+        - generic [ref=e24]:
+          - button "Sign in with Google Continue with Google" [ref=e27] [cursor=pointer]:
+            - generic [ref=e28]:
+              - generic "Sign in with Google" [ref=e30]
+              - generic [ref=e31]: Continue with Google
+          - paragraph [ref=e34]: or
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - generic [ref=e40]:
+                - generic [ref=e42]: Email address
+                - textbox "Email address" [ref=e43]:
+                  - /placeholder: Enter your email address
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Password
+                    - generic:
+                      - textbox "Password":
+                        - /placeholder: Enter your password
+                      - button "Show password":
+                        - img
+            - button "Continue" [ref=e46] [cursor=pointer]:
+              - generic [ref=e47]:
+                - text: Continue
+                - img [ref=e48]
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]: Don’t have an account?
+          - link "Sign up" [ref=e53] [cursor=pointer]:
+            - /url: http://localhost:3004/sign-up
+        - generic [ref=e55]:
+          - generic [ref=e57]:
+            - paragraph [ref=e58]: Secured by
+            - link "Clerk logo" [ref=e59] [cursor=pointer]:
+              - /url: https://go.clerk.com/components
+              - img [ref=e60]
+          - paragraph [ref=e65]: Development mode

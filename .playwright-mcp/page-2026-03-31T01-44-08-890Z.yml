@@ -1,0 +1,5 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - heading "CampaignTrack" [level=1] [ref=e5]
+    - paragraph [ref=e6]: Capital campaign management for nonprofits
+  - alert [ref=e7]

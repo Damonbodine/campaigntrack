@@ -63,13 +63,13 @@ interface GiftEntryFormProps {
 
 export function GiftEntryForm({ open, onOpenChange, campaignId, batchMode = false }: GiftEntryFormProps) {
   const createGift = useMutation(api.gifts.create);
-  const donors = useQuery(api.donors.list) ?? [];
-  const pledges = useQuery(api.pledges.list) ?? [];
+  const donors = useQuery(api.donors.list, {}) ?? [];
+  const pledges = useQuery(api.pledges.listByCampaign, { campaignId }) ?? [];
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [batchCount, setBatchCount] = useState(0);
 
   const form = useForm<GiftEntryFormValues>({
-    resolver: zodResolver(giftSchema),
+    resolver: zodResolver(giftSchema) as never,
     defaultValues: {
       donorId: "",
       amount: 0,

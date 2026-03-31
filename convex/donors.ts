@@ -10,11 +10,11 @@ export const list = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
     if (currentUser.role === "BoardMember") return [];
-    let allDonors = await ctx.db.query("donors").collect();
+    let allDonors = await ctx.db.query("donors").take(100);
     if (currentUser.role === "DevelopmentOfficer") {
       allDonors = allDonors.filter(
         (d) => d.assignedOfficerId === currentUser._id
@@ -35,7 +35,7 @@ export const get = query({
     if (!identity) return null;
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return null;
     if (currentUser.role === "BoardMember") return null;
@@ -57,10 +57,10 @@ export const create = mutation({
     lastName: v.string(),
     email: v.optional(v.string()),
     phone: v.optional(v.string()),
-    addressStreet: v.optional(v.string()),
-    addressCity: v.optional(v.string()),
-    addressState: v.optional(v.string()),
-    addressZip: v.optional(v.string()),
+    street: v.optional(v.string()),
+    city: v.optional(v.string()),
+    state: v.optional(v.string()),
+    zip: v.optional(v.string()),
     organizationName: v.optional(v.string()),
     donorType: v.union(
       v.literal("Individual"),
@@ -105,7 +105,7 @@ export const create = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role === "BoardMember") throw new Error("Unauthorized");
@@ -114,10 +114,10 @@ export const create = mutation({
       lastName: args.lastName,
       email: args.email,
       phone: args.phone,
-      addressStreet: args.addressStreet,
-      addressCity: args.addressCity,
-      addressState: args.addressState,
-      addressZip: args.addressZip,
+      street: args.street,
+      city: args.city,
+      state: args.state,
+      zip: args.zip,
       organizationName: args.organizationName,
       donorType: args.donorType,
       cultivationStage: args.cultivationStage,
@@ -139,10 +139,10 @@ export const update = mutation({
     lastName: v.optional(v.string()),
     email: v.optional(v.string()),
     phone: v.optional(v.string()),
-    addressStreet: v.optional(v.string()),
-    addressCity: v.optional(v.string()),
-    addressState: v.optional(v.string()),
-    addressZip: v.optional(v.string()),
+    street: v.optional(v.string()),
+    city: v.optional(v.string()),
+    state: v.optional(v.string()),
+    zip: v.optional(v.string()),
     organizationName: v.optional(v.string()),
     donorType: v.optional(
       v.union(
@@ -193,7 +193,7 @@ export const update = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role === "BoardMember") throw new Error("Unauthorized");
@@ -211,10 +211,10 @@ export const update = mutation({
     if (fields.lastName !== undefined) updates.lastName = fields.lastName;
     if (fields.email !== undefined) updates.email = fields.email;
     if (fields.phone !== undefined) updates.phone = fields.phone;
-    if (fields.addressStreet !== undefined) updates.addressStreet = fields.addressStreet;
-    if (fields.addressCity !== undefined) updates.addressCity = fields.addressCity;
-    if (fields.addressState !== undefined) updates.addressState = fields.addressState;
-    if (fields.addressZip !== undefined) updates.addressZip = fields.addressZip;
+    if (fields.street !== undefined) updates.street = fields.street;
+    if (fields.city !== undefined) updates.city = fields.city;
+    if (fields.state !== undefined) updates.state = fields.state;
+    if (fields.zip !== undefined) updates.zip = fields.zip;
     if (fields.organizationName !== undefined) updates.organizationName = fields.organizationName;
     if (fields.donorType !== undefined) updates.donorType = fields.donorType;
     if (fields.cultivationStage !== undefined) updates.cultivationStage = fields.cultivationStage;

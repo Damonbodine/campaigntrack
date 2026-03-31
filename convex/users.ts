@@ -8,38 +8,34 @@ export const getCurrentUser = query({
     if (!identity) return null;
     const user = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     return user;
   },
 });
 
 export const upsertCurrentUser = mutation({
-  args: {
-    firstName: v.string(),
-    lastName: v.string(),
-    email: v.string(),
-  },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthenticated");
+    const name = identity.name ?? identity.givenName ?? "User";
+    const email = identity.email ?? "";
     const existing = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (existing) {
       await ctx.db.patch(existing._id, {
-        firstName: args.firstName,
-        lastName: args.lastName,
-        email: args.email,
+        name,
+        email,
       });
       return existing._id;
     }
     const userId = await ctx.db.insert("users", {
-      clerkId: identity.subject,
-      firstName: args.firstName,
-      lastName: args.lastName,
-      email: args.email,
+      clerkId: identity.tokenIdentifier,
+      name,
+      email,
       role: "DataEntry",
       status: "Active",
       createdAt: Date.now(),
@@ -55,11 +51,11 @@ export const list = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
     if (currentUser.role !== "CampaignDirector") return [];
-    return await ctx.db.query("users").collect();
+    return await ctx.db.query("users").take(100);
   },
 });
 
@@ -78,7 +74,7 @@ export const updateRole = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role !== "CampaignDirector") throw new Error("Unauthorized");
@@ -96,7 +92,7 @@ export const updateStatus = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role !== "CampaignDirector") throw new Error("Unauthorized");

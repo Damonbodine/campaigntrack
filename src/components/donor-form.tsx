@@ -69,7 +69,7 @@ export function DonorForm({ open, onOpenChange, donorId, defaultValues }: DonorF
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<DonorFormValues>({
-    resolver: zodResolver(donorSchema),
+    resolver: zodResolver(donorSchema) as never,
     defaultValues: {
       firstName: defaultValues?.firstName ?? "",
       lastName: defaultValues?.lastName ?? "",
@@ -99,10 +99,10 @@ export function DonorForm({ open, onOpenChange, donorId, defaultValues }: DonorF
           : undefined,
       };
       if (donorId) {
-        await updateDonor({ id: donorId, ...payload });
+        await updateDonor({ donorId, ...payload });
         toast.success("Donor updated successfully");
       } else {
-        await createDonor(payload);
+        await createDonor({ ...payload, status: "Active" as const });
         toast.success("Donor created successfully");
       }
       form.reset();

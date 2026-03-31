@@ -60,11 +60,11 @@ export function CultivationActivityForm({
   preselectedDonorId,
 }: CultivationActivityFormProps) {
   const createActivity = useMutation(api.cultivationActivities.create);
-  const donors = useQuery(api.donors.list) ?? [];
+  const donors = useQuery(api.donors.list, {}) ?? [];
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ActivityFormValues>({
-    resolver: zodResolver(activitySchema),
+    resolver: zodResolver(activitySchema) as never,
     defaultValues: {
       donorId: preselectedDonorId ?? "",
       activityDate: new Date().toISOString().split("T")[0],

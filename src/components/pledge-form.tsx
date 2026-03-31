@@ -60,12 +60,12 @@ interface PledgeFormProps {
 
 export function PledgeForm({ open, onOpenChange, campaignId, preselectedDonorId }: PledgeFormProps) {
   const createPledge = useMutation(api.pledges.create);
-  const donors = useQuery(api.donors.list) ?? [];
+  const donors = useQuery(api.donors.list, {}) ?? [];
   const officers = useQuery(api.users.list) ?? [];
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<PledgeFormValues>({
-    resolver: zodResolver(pledgeSchema),
+    resolver: zodResolver(pledgeSchema) as never,
     defaultValues: {
       donorId: preselectedDonorId ?? "",
       totalAmount: 0,

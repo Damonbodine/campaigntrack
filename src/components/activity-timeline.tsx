@@ -6,7 +6,7 @@ import type { Id } from "@/convex/_generated/dataModel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatDate, cn } from "@/lib/utils";
+import { formatDate, formatEnum, cn } from "@/lib/utils";
 import {
   Phone,
   Users,
@@ -85,14 +85,14 @@ export function ActivityTimeline({ donorId }: ActivityTimelineProps) {
             <Card className="flex-1 bg-card border-border">
               <CardContent className="p-4">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <span className="text-sm font-semibold text-foreground">{activity.activityType}</span>
+                  <span className="text-sm font-semibold text-foreground">{formatEnum(activity.activityType)}</span>
                   <span className="text-xs text-muted-foreground">{formatDate(activity.activityDate)}</span>
                   {activity.outcome && (
                     <Badge
                       variant="outline"
                       className={cn("text-xs", OUTCOME_STYLES[activity.outcome] ?? "bg-muted text-muted-foreground")}
                     >
-                      {activity.outcome}
+                      {formatEnum(activity.outcome)}
                     </Badge>
                   )}
                 </div>
@@ -105,9 +105,6 @@ export function ActivityTimeline({ donorId }: ActivityTimelineProps) {
                       <p className="text-xs text-primary mt-1">{formatDate(activity.nextStepDate)}</p>
                     )}
                   </div>
-                )}
-                {activity.loggedByName && (
-                  <p className="mt-2 text-xs text-muted-foreground">Logged by {activity.loggedByName}</p>
                 )}
               </CardContent>
             </Card>

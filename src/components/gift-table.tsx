@@ -14,7 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency, formatDate, cn } from "@/lib/utils";
+import { formatCurrency, formatDate, formatEnum, cn } from "@/lib/utils";
 
 interface GiftTableProps {
   campaignId: Id<"campaigns">;
@@ -73,7 +73,7 @@ export function GiftTable({ campaignId, donorId }: GiftTableProps) {
                     {formatDate(gift.giftDate)}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="text-xs">{gift.giftType}</Badge>
+                    <Badge variant="outline" className="text-xs">{formatEnum(gift.giftType)}</Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
                     {gift.designation ?? "—"}
@@ -83,7 +83,7 @@ export function GiftTable({ campaignId, donorId }: GiftTableProps) {
                       variant="outline"
                       className={cn("text-xs", ACK_STYLES[gift.acknowledgmentStatus] ?? "bg-muted text-muted-foreground")}
                     >
-                      {gift.acknowledgmentStatus}
+                      {formatEnum(gift.acknowledgmentStatus)}
                     </Badge>
                   </TableCell>
                 </TableRow>

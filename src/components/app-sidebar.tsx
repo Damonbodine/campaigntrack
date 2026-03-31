@@ -32,7 +32,7 @@ import { UserButton } from "@clerk/nextjs";
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Donors", href: "/donors", icon: Users },
-  { label: "Pipeline", href: "/pipeline", icon: KanbanSquare },
+  { label: "Pipeline", href: "/donors/pipeline", icon: KanbanSquare },
   { label: "Pledges", href: "/pledges", icon: ScrollText },
   { label: "Gifts", href: "/gifts", icon: Gift },
   { label: "Activities", href: "/activities", icon: CalendarCheck },
@@ -40,7 +40,7 @@ const NAV_ITEMS = [
 
 const SECONDARY_NAV = [
   { label: "Reports", href: "/reports", icon: BarChart3 },
-  { label: "Board View", href: "/board", icon: Thermometer },
+  { label: "Board View", href: "/thermometer", icon: Thermometer },
   { label: "Users", href: "/users", icon: UserCog },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
@@ -69,20 +69,10 @@ export function AppSidebar() {
               const isActive = pathname === href || pathname.startsWith(href + "/");
               return (
                 <SidebarMenuItem key={href}>
-                  <SidebarMenuButton asChild isActive={isActive}>
-                    <Link
-                      href={href}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      )}
-                    >
-                      <Icon className="h-4 w-4 flex-shrink-0" />
-                      <span>{label}</span>
-                      {isActive && <ChevronRight className="ml-auto h-3.5 w-3.5" />}
-                    </Link>
+                  <SidebarMenuButton isActive={isActive} render={<Link href={href} />}>
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <span>{label}</span>
+                    {isActive && <ChevronRight className="ml-auto h-3.5 w-3.5" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               );
@@ -99,19 +89,9 @@ export function AppSidebar() {
               const isActive = pathname === href || pathname.startsWith(href + "/");
               return (
                 <SidebarMenuItem key={href}>
-                  <SidebarMenuButton asChild isActive={isActive}>
-                    <Link
-                      href={href}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      )}
-                    >
-                      <Icon className="h-4 w-4 flex-shrink-0" />
-                      <span>{label}</span>
-                    </Link>
+                  <SidebarMenuButton isActive={isActive} render={<Link href={href} />}>
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <span>{label}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               );
@@ -122,7 +102,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="px-4 py-4 border-t border-border">
         <div className="flex items-center gap-3">
-          <UserButton afterSignOutUrl="/sign-in" />
+          <UserButton />
           <div className="flex-1 min-w-0">
             <p className="text-xs text-muted-foreground truncate">Account</p>
           </div>

@@ -8,13 +8,28 @@ export const listByCampaign = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
-    return await ctx.db
+    const phases = await ctx.db
       .query("campaignPhases")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
+      .take(100);
+    const gifts = await ctx.db
+      .query("gifts")
+      .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
+      .take(100);
+    return phases.map((phase) => {
+      const phaseStart = new Date(phase.startDate).getTime();
+      const phaseEnd = new Date(phase.endDate).getTime();
+      const raisedAmount = gifts
+        .filter((g) => {
+          const giftTime = new Date(g.giftDate).getTime();
+          return giftTime >= phaseStart && giftTime <= phaseEnd;
+        })
+        .reduce((sum, g) => sum + g.amount, 0);
+      return { ...phase, raisedAmount };
+    });
   },
 });
 
@@ -38,7 +53,7 @@ export const create = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role !== "CampaignDirector") throw new Error("Unauthorized");
@@ -79,7 +94,7 @@ export const update = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role !== "CampaignDirector") throw new Error("Unauthorized");

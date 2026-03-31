@@ -1,0 +1,37 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - heading "CampaignTrack" [level=1] [ref=e5]
+      - paragraph [ref=e6]: Capital campaign management for nonprofits
+    - generic [ref=e111]:
+      - generic [ref=e112]:
+        - heading "Password compromised" [level=1] [ref=e115]
+        - generic [ref=e118]:
+          - img [ref=e119]
+          - paragraph [ref=e122]: This password has been found as part of a breach and can not be used, please reset your password.
+        - generic [ref=e123]:
+          - button "Reset your password" [ref=e124] [cursor=pointer]
+          - paragraph [ref=e127]: Or, sign in with another method
+          - generic [ref=e129]:
+            - button "Sign in with Google Continue with Google" [ref=e133] [cursor=pointer]:
+              - generic [ref=e134]:
+                - generic "Sign in with Google" [ref=e136]
+                - generic [ref=e137]: Continue with Google
+            - link "Back" [ref=e139] [cursor=pointer]:
+              - /url: http://localhost:3004/CLERK-ROUTER/HASH/factor-one
+              - paragraph [ref=e140]: Back
+      - generic [ref=e141]:
+        - generic [ref=e142]:
+          - generic [ref=e143]: Don’t have any of these?
+          - link "Get help" [ref=e144] [cursor=pointer]:
+            - /url: http://localhost:3004/CLERK-ROUTER/HASH/factor-one
+        - generic [ref=e146]:
+          - generic [ref=e148]:
+            - paragraph [ref=e149]: Secured by
+            - link "Clerk logo" [ref=e150] [cursor=pointer]:
+              - /url: https://go.clerk.com/components
+              - img [ref=e151]
+          - paragraph [ref=e156]: Development mode
+  - button "Open Next.js Dev Tools" [ref=e62] [cursor=pointer]:
+    - img [ref=e63]
+  - alert [ref=e7]

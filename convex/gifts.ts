@@ -8,14 +8,14 @@ export const listByCampaign = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
     if (currentUser.role === "BoardMember") return [];
     const gifts = await ctx.db
       .query("gifts")
       .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-      .collect();
+      .take(100);
     if (currentUser.role === "DevelopmentOfficer") {
       const filtered: typeof gifts = [];
       for (const gift of gifts) {
@@ -24,9 +24,21 @@ export const listByCampaign = query({
           filtered.push(gift);
         }
       }
-      return filtered;
+      const result = [];
+      for (const gift of filtered) {
+        const donor = await ctx.db.get(gift.donorId);
+        const donorName = donor ? `${donor.firstName} ${donor.lastName}` : "Unknown";
+        result.push({ ...gift, donorName });
+      }
+      return result;
     }
-    return gifts;
+    const result = [];
+    for (const gift of gifts) {
+      const donor = await ctx.db.get(gift.donorId);
+      const donorName = donor ? `${donor.firstName} ${donor.lastName}` : "Unknown";
+      result.push({ ...gift, donorName });
+    }
+    return result;
   },
 });
 
@@ -37,7 +49,7 @@ export const listByDonor = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
     if (currentUser.role === "BoardMember") return [];
@@ -48,7 +60,7 @@ export const listByDonor = query({
     return await ctx.db
       .query("gifts")
       .withIndex("by_donorId", (q) => q.eq("donorId", args.donorId))
-      .collect();
+      .take(100);
   },
 });
 
@@ -59,7 +71,7 @@ export const listByPledge = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
     if (currentUser.role === "BoardMember") return [];
@@ -72,7 +84,7 @@ export const listByPledge = query({
     return await ctx.db
       .query("gifts")
       .withIndex("by_pledgeId", (q) => q.eq("pledgeId", args.pledgeId))
-      .collect();
+      .take(100);
   },
 });
 
@@ -110,7 +122,7 @@ export const create = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role === "BoardMember") throw new Error("Unauthorized");
@@ -141,7 +153,7 @@ export const create = mutation({
       const pendingMilestones = await ctx.db
         .query("milestones")
         .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
-        .collect();
+        .take(100);
       for (const milestone of pendingMilestones) {
         if (
           milestone.milestoneType === "Financial" &&
@@ -190,7 +202,7 @@ export const updateAcknowledgment = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role === "BoardMember") throw new Error("Unauthorized");

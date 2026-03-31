@@ -33,7 +33,7 @@ const STAGE_COLORS: Record<CultivationStage, string> = {
 };
 
 export function DonorPipelineKanban() {
-  const donors = useQuery(api.donors.list);
+  const donors = useQuery(api.donors.list, {});
   const updateDonor = useMutation(api.donors.update);
   const router = useRouter();
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export function DonorPipelineKanban() {
   const handleDrop = async (stage: CultivationStage) => {
     if (!draggingId) return;
     try {
-      await updateDonor({ id: draggingId as Id<"donors">, cultivationStage: stage });
+      await updateDonor({ donorId: draggingId as Id<"donors">, cultivationStage: stage });
     } catch (err) {
       console.error("Failed to update cultivation stage", err);
     } finally {

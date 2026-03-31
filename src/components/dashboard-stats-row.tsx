@@ -39,23 +39,23 @@ export function DashboardStatsRow({ campaignId }: DashboardStatsRowProps) {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
         label="Gifts This Month"
-        value={formatCurrency(stats.giftsThisMonth ?? 0)}
-        subtitle={`${stats.giftCountThisMonth ?? 0} gifts received`}
-        trend={stats.giftsThisMonth > 0 ? "up" : undefined}
+        value={formatCurrency(stats.giftsThisMonthTotal ?? 0)}
+        subtitle={`${stats.giftsThisMonthCount ?? 0} gifts received`}
+        trend={stats.giftsThisMonthTotal > 0 ? "up" : undefined}
       />
       <StatCard
         label="Fulfillment Rate"
-        value={formatPercent(stats.fulfillmentRate ?? 0)}
+        value={formatPercent((stats.pledgeFulfillmentRate ?? 0) / 100)}
         subtitle="of pledged dollars received"
       />
       <StatCard
         label="Active Pledges"
-        value={stats.activePledgeCount ?? 0}
-        subtitle={formatCurrency(stats.activePledgeTotal ?? 0) + " total pledged"}
+        value={stats.activePledgesCount ?? 0}
+        subtitle={formatCurrency(stats.totalPledged ?? 0) + " total pledged"}
       />
       <StatCard
         label="Milestones"
-        value={`${stats.milestonesAchieved ?? 0} / ${stats.milestonesTotal ?? 0}`}
+        value={`${stats.milestonesAchieved ?? 0} / ${(stats.milestonesAchieved ?? 0) + (stats.milestonesPending ?? 0)}`}
         subtitle={`${stats.milestonesPending ?? 0} pending`}
       />
     </div>

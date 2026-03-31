@@ -14,7 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatEnum } from "@/lib/utils";
 
 interface RecentGiftsTableProps {
   campaignId: Id<"campaigns">;
@@ -52,16 +52,16 @@ export function RecentGiftsTable({ campaignId }: RecentGiftsTableProps) {
             </TableHeader>
             <TableBody>
               {gifts.map((gift) => (
-                <TableRow key={gift._id} className="border-border">
+                <TableRow key={gift.giftId} className="border-border">
                   <TableCell className="font-medium">
                     {gift.isAnonymous ? "Anonymous" : gift.donorName ?? "Unknown"}
                   </TableCell>
                   <TableCell className="font-semibold text-foreground">
-                    {formatCurrency(gift.amount)}
+                    {gift.amount != null ? formatCurrency(gift.amount) : "—"}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="text-xs">
-                      {gift.giftType}
+                      {formatEnum(gift.giftType)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
@@ -78,7 +78,7 @@ export function RecentGiftsTable({ campaignId }: RecentGiftsTableProps) {
                       }
                       variant="outline"
                     >
-                      {gift.acknowledgmentStatus}
+                      {formatEnum(gift.acknowledgmentStatus)}
                     </Badge>
                   </TableCell>
                 </TableRow>

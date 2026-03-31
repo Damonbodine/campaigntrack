@@ -10,10 +10,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserPlus } from "lucide-react";
 import Link from "next/link";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatEnum } from "@/lib/utils";
 
 export default function DonorsPage() {
-  const donors = useQuery(api.donors.list);
+  const donors = useQuery(api.donors.list, {});
   const [showForm, setShowForm] = useState(false);
 
   return (
@@ -56,8 +56,8 @@ export default function DonorsPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="text-xs">{donor.cultivationStage}</Badge>
-                    <Badge variant="secondary" className="text-xs">{donor.donorTier}</Badge>
+                    <Badge variant="outline" className="text-xs">{formatEnum(donor.cultivationStage)}</Badge>
+                    <Badge variant="secondary" className="text-xs">{formatEnum(donor.donorTier)}</Badge>
                   </div>
                 </CardContent>
               </Card>

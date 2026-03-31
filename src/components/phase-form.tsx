@@ -60,7 +60,7 @@ export function PhaseForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<PhaseFormValues>({
-    resolver: zodResolver(phaseSchema),
+    resolver: zodResolver(phaseSchema) as never,
     defaultValues: {
       name: defaultValues?.name ?? "",
       goalAmount: defaultValues?.goalAmount ?? 0,
@@ -75,10 +75,10 @@ export function PhaseForm({
     setIsSubmitting(true);
     try {
       if (phaseId) {
-        await updatePhase({ id: phaseId, ...values });
+        await updatePhase({ phaseId, ...values });
         toast.success("Phase updated successfully");
       } else {
-        await createPhase({ campaignId, ...values });
+        await createPhase({ campaignId, ...values, status: "Upcoming" as const });
         toast.success("Phase created successfully");
       }
       form.reset();

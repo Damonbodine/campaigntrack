@@ -29,13 +29,13 @@ import { toast } from "sonner";
 
 const campaignSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  description: z.string().optional(),
+  description: z.string().default(""),
   goalAmount: z.coerce.number().positive("Goal must be a positive number"),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().min(1, "End date is required"),
 });
 
-type CampaignFormValues = z.infer<typeof campaignSchema>;
+type CampaignFormValues = z.output<typeof campaignSchema>;
 
 interface CampaignFormProps {
   open: boolean;
@@ -50,7 +50,7 @@ export function CampaignForm({ open, onOpenChange, campaignId, defaultValues }: 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CampaignFormValues>({
-    resolver: zodResolver(campaignSchema),
+    resolver: zodResolver(campaignSchema) as never,
     defaultValues: {
       name: defaultValues?.name ?? "",
       description: defaultValues?.description ?? "",
@@ -64,10 +64,14 @@ export function CampaignForm({ open, onOpenChange, campaignId, defaultValues }: 
     setIsSubmitting(true);
     try {
       if (campaignId) {
-        await updateCampaign({ id: campaignId, ...values });
+        await updateCampaign({ campaignId, ...values });
         toast.success("Campaign updated successfully");
       } else {
-        await createCampaign(values);
+        await createCampaign({
+          ...values,
+          currentPhase: "QuietPhase" as const,
+          status: "Planning" as const,
+        });
         toast.success("Campaign created successfully");
       }
       form.reset();

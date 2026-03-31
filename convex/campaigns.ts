@@ -8,10 +8,10 @@ export const list = query({
     if (!identity) return [];
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return [];
-    return await ctx.db.query("campaigns").collect();
+    return await ctx.db.query("campaigns").take(100);
   },
 });
 
@@ -22,7 +22,7 @@ export const get = query({
     if (!identity) return null;
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) return null;
     return await ctx.db.get(args.campaignId);
@@ -32,7 +32,7 @@ export const get = query({
 export const create = mutation({
   args: {
     name: v.string(),
-    description: v.optional(v.string()),
+    description: v.string(),
     goalAmount: v.number(),
     startDate: v.string(),
     endDate: v.string(),
@@ -55,7 +55,7 @@ export const create = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role !== "CampaignDirector") throw new Error("Unauthorized: only Campaign Directors can create campaigns");
@@ -106,7 +106,7 @@ export const update = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const currentUser = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.tokenIdentifier))
       .unique();
     if (!currentUser) throw new Error("User not found");
     if (currentUser.role !== "CampaignDirector") throw new Error("Unauthorized: only Campaign Directors can update campaigns");

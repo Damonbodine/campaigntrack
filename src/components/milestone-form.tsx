@@ -64,7 +64,7 @@ export function MilestoneForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<MilestoneFormValues>({
-    resolver: zodResolver(milestoneSchema),
+    resolver: zodResolver(milestoneSchema) as never,
     defaultValues: {
       name: defaultValues?.name ?? "",
       milestoneType: defaultValues?.milestoneType ?? "Financial",
@@ -88,10 +88,10 @@ export function MilestoneForm({
         description: values.description,
       };
       if (milestoneId) {
-        await updateMilestone({ id: milestoneId, ...payload });
+        await updateMilestone({ milestoneId, ...payload });
         toast.success("Milestone updated successfully");
       } else {
-        await createMilestone({ campaignId, ...payload });
+        await createMilestone({ campaignId, ...payload, status: "Pending" as const });
         toast.success("Milestone created successfully");
       }
       form.reset();

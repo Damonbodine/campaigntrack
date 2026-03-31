@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatEnum } from "@/lib/utils";
 import { PledgeTable } from "./pledge-table";
 import { GiftTable } from "./gift-table";
 import { ActivityTimeline } from "./activity-timeline";
+import { useActiveCampaign } from "@/hooks/use-campaign";
 import { Mail, Phone, MapPin, User, Building2 } from "lucide-react";
 
 interface DonorDetailViewProps {
@@ -18,7 +19,8 @@ interface DonorDetailViewProps {
 }
 
 export function DonorDetailView({ donorId }: DonorDetailViewProps) {
-  const donor = useQuery(api.donors.getById, { id: donorId });
+  const donor = useQuery(api.donors.get, { donorId });
+  const campaignId = useActiveCampaign();
 
   if (donor === undefined) {
     return (
@@ -53,7 +55,7 @@ export function DonorDetailView({ donorId }: DonorDetailViewProps) {
                 <h1 className="text-2xl font-bold text-foreground">
                   {donor.firstName} {donor.lastName}
                 </h1>
-                <Badge variant="outline" className="capitalize">{donor.cultivationStage}</Badge>
+                <Badge variant="outline">{formatEnum(donor.cultivationStage)}</Badge>
                 <Badge
                   variant="outline"
                   className={
@@ -74,7 +76,7 @@ export function DonorDetailView({ donorId }: DonorDetailViewProps) {
             </div>
             <div className="flex flex-col gap-1 text-sm">
               <span className="text-muted-foreground">Tier</span>
-              <Badge variant="secondary" className="w-fit">{donor.donorTier}</Badge>
+              <Badge variant="secondary" className="w-fit">{formatEnum(donor.donorTier)}</Badge>
             </div>
           </div>
 
@@ -95,47 +97,27 @@ export function DonorDetailView({ donorId }: DonorDetailViewProps) {
                 <span>{donor.phone}</span>
               </div>
             )}
-            {(donor.address?.city || donor.address?.state) && (
+            {(donor.city || donor.state) && (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
                 <span>
-                  {[donor.address.city, donor.address.state].filter(Boolean).join(", ")}
+                  {[donor.city, donor.state].filter(Boolean).join(", ")}
                 </span>
-              </div>
-            )}
-            {donor.assignedOfficerName && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <User className="h-4 w-4" />
-                <span>{donor.assignedOfficerName}</span>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Giving Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Capacity */}
+      {donor.capacity && (
         <Card className="bg-card border-border">
           <CardContent className="p-6">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Campaign Total</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{formatCurrency(donor.campaignTotal ?? 0)}</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Giving Capacity</p>
+            <p className="mt-1 text-lg font-bold text-foreground">{formatEnum(donor.capacity)}</p>
           </CardContent>
         </Card>
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Lifetime Total</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{formatCurrency(donor.lifetimeTotal ?? 0)}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Last Gift</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">
-              {donor.lastGiftDate ? formatDate(donor.lastGiftDate) : "—"}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      )}
 
       {/* Relationship Notes */}
       {donor.relationshipNotes && (
@@ -150,18 +132,18 @@ export function DonorDetailView({ donorId }: DonorDetailViewProps) {
       )}
 
       {/* Pledges */}
-      {donor.campaignId && (
+      {campaignId && (
         <div>
           <h2 className="text-lg font-semibold text-foreground mb-3">Pledges</h2>
-          <PledgeTable campaignId={donor.campaignId} donorId={donorId} />
+          <PledgeTable campaignId={campaignId} donorId={donorId} />
         </div>
       )}
 
       {/* Gifts */}
-      {donor.campaignId && (
+      {campaignId && (
         <div>
           <h2 className="text-lg font-semibold text-foreground mb-3">Gifts</h2>
-          <GiftTable campaignId={donor.campaignId} donorId={donorId} />
+          <GiftTable campaignId={campaignId} donorId={donorId} />
         </div>
       )}
 

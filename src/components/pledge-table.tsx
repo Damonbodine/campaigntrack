@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
-import { formatCurrency, formatDate, cn } from "@/lib/utils";
+import { formatCurrency, formatDate, formatEnum, cn } from "@/lib/utils";
 import { AlertTriangle } from "lucide-react";
 
 interface PledgeTableProps {
@@ -91,7 +91,7 @@ export function PledgeTable({ campaignId, donorId }: PledgeTableProps) {
                         <span className="text-xs text-muted-foreground w-8 text-right">{pct}%</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{pledge.frequency}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{formatEnum(pledge.frequency)}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">
                       {formatDate(pledge.endDate)}
                     </TableCell>
@@ -100,7 +100,7 @@ export function PledgeTable({ campaignId, donorId }: PledgeTableProps) {
                         variant="outline"
                         className={cn("text-xs", STATUS_STYLES[pledge.status] ?? "bg-muted text-muted-foreground")}
                       >
-                        {pledge.status}
+                        {formatEnum(pledge.status)}
                       </Badge>
                     </TableCell>
                   </TableRow>
